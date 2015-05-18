@@ -6,19 +6,19 @@ DATE="`date +%Y-%m-%d_%H-%M`"
 DATABASE=" --all-databases --ignore-table=mysql.event "
 BACKUPSET="SERVERNAME"
 BACKUPROOT="/root/backup"
-WEBROOT="/var/www /etc/apache2 /etc/mysql"
+FILES="/var/www /etc/apache2 /etc/mysql"
 
-# Remove yesterday's settings
+# Delete yesterday's backup files.
 rm $BACKUPROOT/$BACKUPSET.*
 
-# password in ~/.my.cnf
+# Dump MySQL databases. The password is stored in ~/.my.cnf
 mysqldump -u root $DATABASE | gzip -9 -c > $BACKUPROOT/$BACKUPSET.$DATE.sql.gz
 
-# https://github.com/andreafabrizi/Dropbox-Uploader
+# Upload to Dropbox. https://github.com/andreafabrizi/Dropbox-Uploader
 /root/dropbox_uploader.sh -q upload $BACKUPROOT/$BACKUPSET.$DATE.sql.gz $BACKUPSET.$DATE.sql.gz
 
-# Compress
-tar -zcf $BACKUPROOT/$BACKUPSET.$DATE.tar.gz $WEBROOT
+# Compress files.
+tar -zcf $BACKUPROOT/$BACKUPSET.$DATE.tar.gz $FILES
 
 # Upload to Dropbox
 /root/dropbox_uploader.sh -q upload $BACKUPROOT/$BACKUPSET.$DATE.tar.gz $BACKUPSET.$DATE.tar.gz
